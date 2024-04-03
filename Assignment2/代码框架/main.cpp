@@ -6,6 +6,11 @@
 
 constexpr double MY_PI = 3.1415926;
 
+float degrees_to_radians(float degrees)
+{
+    return degrees * MY_PI / 180.0;
+}
+
 Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos)
 {
     Eigen::Matrix4f view = Eigen::Matrix4f::Identity();
@@ -30,7 +35,35 @@ Eigen::Matrix4f get_model_matrix(float rotation_angle)
 Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio, float zNear, float zFar)
 {
     // TODO: Copy-paste your implementation from the previous assignment.
-    Eigen::Matrix4f projection;
+    Eigen::Matrix4f projection = Eigen::Matrix4f::Identity();
+
+    zNear = -zNear;
+    zFar = -zFar;
+
+    // Perspective to Orthographic
+    Eigen::Matrix4f persp_to_ortho;
+    persp_to_ortho << zNear, 0, 0, 0,
+        0, zNear, 0, 0,
+        0, 0, zNear + zFar, -zNear * zFar,
+        0, 0, 1, 0;
+
+    // Orthographic, translate first, then scale
+    float yTop = abs(zNear) * tan(degrees_to_radians(eye_fov / 2.0));
+    float xRight = aspect_ratio * yTop;
+
+    Eigen::Matrix4f translation;
+    translation << 1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, -(zNear + zFar) / 2,
+        0, 0, 0, 1;
+
+    Eigen::Matrix4f scale;
+    scale << 1 / xRight, 0, 0, 0,
+        0, 1 / yTop, 0, 0,
+        0, 0, 2 / (zNear - zFar), 0,
+        0, 0, 0, 1;
+
+    projection = scale * translation * persp_to_ortho * projection;
 
     return projection;
 }
