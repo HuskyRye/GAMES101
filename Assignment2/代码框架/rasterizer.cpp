@@ -135,7 +135,7 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t)
 
                 // TODO : set the current pixel (use the set_pixel function) to the color of the triangle (use getColor function) if it should be painted.
                 if (z_interpolated < depth_buf[get_index(x, y)]) {
-                    set_pixel(Eigen::Vector3f(x, y, 1.0f), t.getColor());
+                    set_pixel(Eigen::Vector3f { static_cast<float>(x), static_cast<float>(x), 1.0f }, t.getColor());
                     depth_buf[get_index(x, y)] = z_interpolated;
                 }
             }
