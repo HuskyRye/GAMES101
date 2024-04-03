@@ -6,6 +6,11 @@
 
 constexpr double MY_PI = 3.1415926;
 
+float degrees_to_radians(float degrees)
+{
+    return degrees * MY_PI / 180.0;
+}
+
 Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos)
 {
     Eigen::Matrix4f view = Eigen::Matrix4f::Identity();
@@ -26,12 +31,21 @@ Eigen::Matrix4f get_model_matrix(float rotation_angle)
     // TODO: Implement this function
     // Create the model matrix for rotating the triangle around the Z axis.
     // Then return it.
+    float theta = degrees_to_radians(rotation_angle);
+    float cos_theta = cos(theta);
+    float sin_theta = sin(theta);
+    Eigen::Matrix4f rotation;
+    rotation << cos(theta), -sin(theta), 0, 0,
+        sin(theta), cos(theta), 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1;
+
+    model = rotation * model;
 
     return model;
 }
 
-Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
-                                      float zNear, float zFar)
+Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio, float zNear, float zFar)
 {
     // Students will implement this function
 
@@ -41,7 +55,55 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
     // Create the projection matrix for the given parameters.
     // Then return it.
 
+    zNear = -zNear;
+    zFar = -zFar;
+
+    // Perspective to Orthographic
+    Eigen::Matrix4f persp_to_ortho;
+    persp_to_ortho << zNear, 0, 0, 0,
+        0, zNear, 0, 0,
+        0, 0, zNear + zFar, -zNear * zFar,
+        0, 0, 1, 0;
+
+    // Orthographic, translate first, then scale
+    float yTop = abs(zNear) * tan(degrees_to_radians(eye_fov / 2.0));
+    float xRight = aspect_ratio * yTop;
+
+    Eigen::Matrix4f translation;
+    translation << 1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, -(zNear + zFar) / 2,
+        0, 0, 0, 1;
+
+    Eigen::Matrix4f scale;
+    scale << 1 / xRight, 0, 0, 0,
+        0, 1 / yTop, 0, 0,
+        0, 0, 2 / (zNear - zFar), 0,
+        0, 0, 0, 1;
+
+    projection = scale * translation * persp_to_ortho * projection;
+
     return projection;
+}
+
+Eigen::Matrix4f get_rotation(Vector3f axis, float angle)
+{
+    Eigen::Matrix4f rotation = Eigen::Matrix4f::Identity();
+
+    Eigen::Matrix3f N;
+    N << 0, -axis.z(), axis.y(),
+        axis.z(), 0, -axis.x(),
+        -axis.y(), axis.x(), 0;
+
+    float alpha = degrees_to_radians(angle);
+
+    Eigen::Matrix3f R = cos(alpha) * Eigen::Matrix3f::Identity()
+        + (1 - cos(alpha)) * axis * axis.transpose()
+        + sin(alpha) * N;
+
+    rotation.block<3, 3>(0, 0) = R;
+
+    return rotation;
 }
 
 int main(int argc, const char** argv)
@@ -56,17 +118,15 @@ int main(int argc, const char** argv)
         if (argc == 4) {
             filename = std::string(argv[3]);
         }
-        else
-            return 0;
     }
 
     rst::rasterizer r(700, 700);
 
-    Eigen::Vector3f eye_pos = {0, 0, 5};
+    Eigen::Vector3f eye_pos = { 0, 0, 5 };
 
-    std::vector<Eigen::Vector3f> pos{{2, 0, -2}, {0, 2, -2}, {-2, 0, -2}};
+    std::vector<Eigen::Vector3f> pos { { 2, 0, -2 }, { 0, 2, -2 }, { -2, 0, -2 } };
 
-    std::vector<Eigen::Vector3i> ind{{0, 1, 2}};
+    std::vector<Eigen::Vector3i> ind { { 0, 1, 2 } };
 
     auto pos_id = r.load_positions(pos);
     auto ind_id = r.load_indices(ind);
@@ -94,6 +154,7 @@ int main(int argc, const char** argv)
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
 
         r.set_model(get_model_matrix(angle));
+        // r.set_model(get_rotation({ 2, 0, 1 }, angle));
         r.set_view(get_view_matrix(eye_pos));
         r.set_projection(get_projection_matrix(45, 1, 0.1, 50));
 
@@ -108,8 +169,7 @@ int main(int argc, const char** argv)
 
         if (key == 'a') {
             angle += 10;
-        }
-        else if (key == 'd') {
+        } else if (key == 'd') {
             angle -= 10;
         }
     }
