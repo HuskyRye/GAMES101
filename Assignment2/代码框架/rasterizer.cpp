@@ -91,7 +91,7 @@ void rst::rasterizer::draw(pos_buf_id pos_buffer, ind_buf_id ind_buffer, col_buf
         for (auto& vert : v) {
             vert.x() = 0.5 * width * (vert.x() + 1.0);
             vert.y() = 0.5 * height * (vert.y() + 1.0);
-            vert.z() = -(vert.z() * f1 + f2); // reverse z to make sure they are all positive
+            vert.z() = -(vert.z() * f1 - f2); // reverse z to make sure they are all positive
         }
 
         for (int i = 0; i < 3; ++i) {
@@ -135,7 +135,7 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t)
 
                 // TODO : set the current pixel (use the set_pixel function) to the color of the triangle (use getColor function) if it should be painted.
                 if (z_interpolated < depth_buf[get_index(x, y)]) {
-                    set_pixel(Eigen::Vector3f { static_cast<float>(x), static_cast<float>(x), 1.0f }, t.getColor());
+                    set_pixel(Eigen::Vector3f { static_cast<float>(x), static_cast<float>(y), 1.0f }, t.getColor());
                     depth_buf[get_index(x, y)] = z_interpolated;
                 }
             }
