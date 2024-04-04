@@ -79,7 +79,7 @@ int main(int argc, const char** argv)
         filename = std::string(argv[1]);
     }
 
-    rst::rasterizer r(700, 700);
+    rst::rasterizer r(700, 700, 2);
 
     Eigen::Vector3f eye_pos = { 0, 0, 5 };
 
@@ -110,9 +110,6 @@ int main(int argc, const char** argv)
     auto ind_id = r.load_indices(ind);
     auto col_id = r.load_colors(cols);
 
-    int key = 0;
-    int frame_count = 0;
-
     if (command_line) {
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
 
@@ -130,6 +127,10 @@ int main(int argc, const char** argv)
         return 0;
     }
 
+    int key = 0;
+    int frame_count = 0;
+    auto start = cv::getTickCount();
+
     while (key != 27) {
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
 
@@ -142,10 +143,20 @@ int main(int argc, const char** argv)
         cv::Mat image(700, 700, CV_32FC3, r.frame_buffer().data());
         image.convertTo(image, CV_8UC3, 1.0f);
         cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
-        cv::imshow("image", image);
-        key = cv::waitKey(10);
 
-        std::cout << "frame count: " << frame_count++ << '\n';
+        ++frame_count;
+        if (frame_count == 100) {
+            double time = (cv::getTickCount() - start) / cv::getTickFrequency();
+            double fps = frame_count / time;
+            std::cout << "fps: " << fps << '\n';
+            frame_count = 0;
+            start = cv::getTickCount();
+        }
+
+        cv::imshow("image", image);
+        key = cv::waitKey(1);
+
+        // std::cout << "frame count: " << frame_count++ << '\n';
     }
 
     return 0;
