@@ -263,15 +263,14 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t, const std::array<Eig
                     float sample_x = pixel_x + 1.0f / (2 * ssaa) + i * 1.0f / ssaa;
                     float sample_y = pixel_y + 1.0f / (2 * ssaa) + j * 1.0f / ssaa;
                     if (insideTriangle(sample_x, sample_y, t.v)) {
-                        // TODO: Inside your rasterization loop:
-                        //    * v[i].w() is the vertex view space depth value z.
-                        //    * Z is interpolated view space depth for the current pixel
-                        //    * zp is depth between zNear and zFar, used for z-buffer
                         auto [alpha, beta, gamma] = computeBarycentric2D(sample_x, sample_y, t.v);
-                        float Z = 1.0 / (alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
-                        float zp = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
-                        zp *= Z;
+                        // Perspective Correct Interpolation
+                        float k = alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w();
+                        alpha = alpha / v[0].w() / k;
+                        beta = beta / v[1].w() / k;
+                        gamma = gamma / v[2].w() / k;
 
+                        float zp = alpha * v[0].z() + beta * v[1].z() + gamma * v[2].z();
                         int index = get_index(pixel_x, pixel_y) * ssaa * ssaa + (j * ssaa + i);
                         if (zp < depth_buf[index]) {
                             // TODO: Interpolate the attributes:
