@@ -50,7 +50,7 @@ struct col_buf_id {
 
 class rasterizer {
 public:
-    rasterizer(int w, int h, int msaa = 1);
+    rasterizer(int w, int h, int ssaa = 1);
     pos_buf_id load_positions(const std::vector<Eigen::Vector3f>& positions);
     ind_buf_id load_indices(const std::vector<Eigen::Vector3i>& indices);
     col_buf_id load_colors(const std::vector<Eigen::Vector3f>& colors);
@@ -85,8 +85,8 @@ private:
 
     std::vector<Eigen::Vector3f> frame_buf;
 
-    int msaa;
-    std::vector<Eigen::Vector3f> msaa_buf;
+    int ssaa;
+    std::vector<Eigen::Vector3f> ssaa_buf;
     std::vector<float> depth_buf;
     int get_index(int x, int y);
 

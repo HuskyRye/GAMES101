@@ -233,10 +233,10 @@ static Eigen::Vector2f interpolate(float alpha, float beta, float gamma, const E
 
 std::vector<Eigen::Vector3f>& rst::rasterizer::frame_buffer()
 {
-    int sample_count = msaa * msaa;
+    int sample_count = ssaa * ssaa;
     for (int i = 0; i < width * height; ++i) {
         for (int j = 0; j < sample_count; ++j)
-            frame_buf[i] += msaa_buf[i * sample_count + j];
+            frame_buf[i] += ssaa_buf[i * sample_count + j];
         frame_buf[i] /= sample_count;
     }
     return frame_buf;
@@ -257,11 +257,11 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t, const std::array<Eig
     // iterate through the pixel and find if the current pixel is inside the triangle
     for (int pixel_y = y_min; pixel_y < y_max; ++pixel_y) {
         for (int pixel_x = x_min; pixel_x < x_max; ++pixel_x) {
-            // for every msaa pixel
-            for (int j = 0; j < msaa; ++j) {
-                for (int i = 0; i < msaa; ++i) {
-                    float sample_x = pixel_x + 1.0f / (2 * msaa) + i * 1.0f / msaa;
-                    float sample_y = pixel_y + 1.0f / (2 * msaa) + j * 1.0f / msaa;
+            // for every ssaa pixel
+            for (int j = 0; j < ssaa; ++j) {
+                for (int i = 0; i < ssaa; ++i) {
+                    float sample_x = pixel_x + 1.0f / (2 * ssaa) + i * 1.0f / ssaa;
+                    float sample_y = pixel_y + 1.0f / (2 * ssaa) + j * 1.0f / ssaa;
                     if (insideTriangle(sample_x, sample_y, t.v)) {
                         // TODO: Inside your rasterization loop:
                         //    * v[i].w() is the vertex view space depth value z.
@@ -272,7 +272,7 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t, const std::array<Eig
                         float zp = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
                         zp *= Z;
 
-                        int index = get_index(pixel_x, pixel_y) * msaa * msaa + (j * msaa + i);
+                        int index = get_index(pixel_x, pixel_y) * ssaa * ssaa + (j * ssaa + i);
                         if (zp < depth_buf[index]) {
                             // TODO: Interpolate the attributes:
                             auto interpolated_color = interpolate(alpha, beta, gamma, t.color[0], t.color[1], t.color[2], 1.0f);
@@ -284,7 +284,7 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t, const std::array<Eig
                             payload.view_pos = interpolated_shadingcoords;
                             // Instead of passing the triangle's color directly to the frame buffer, pass the color to the shaders first to get the final color;
                             auto pixel_color = fragment_shader(payload);
-                            msaa_buf[index] = pixel_color;
+                            ssaa_buf[index] = pixel_color;
                             depth_buf[index] = zp;
                         }
                     }
@@ -313,21 +313,21 @@ void rst::rasterizer::clear(rst::Buffers buff)
 {
     if ((buff & rst::Buffers::Color) == rst::Buffers::Color) {
         std::fill(frame_buf.begin(), frame_buf.end(), Eigen::Vector3f { 0, 0, 0 });
-        std::fill(msaa_buf.begin(), msaa_buf.end(), Eigen::Vector3f { 0, 0, 0 });
+        std::fill(ssaa_buf.begin(), ssaa_buf.end(), Eigen::Vector3f { 0, 0, 0 });
     }
     if ((buff & rst::Buffers::Depth) == rst::Buffers::Depth) {
         std::fill(depth_buf.begin(), depth_buf.end(), std::numeric_limits<float>::infinity());
     }
 }
 
-rst::rasterizer::rasterizer(int w, int h, int msaa)
+rst::rasterizer::rasterizer(int w, int h, int ssaa)
     : width(w)
     , height(h)
-    , msaa(msaa)
+    , ssaa(ssaa)
 {
     frame_buf.resize(w * h);
-    msaa_buf.resize(w * h * msaa * msaa);
-    depth_buf.resize(w * h * msaa * msaa);
+    ssaa_buf.resize(w * h * ssaa * ssaa);
+    depth_buf.resize(w * h * ssaa * ssaa);
 
     texture = std::nullopt;
 }
