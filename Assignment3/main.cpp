@@ -8,6 +8,11 @@
 #include "global.hpp"
 #include "rasterizer.hpp"
 
+float degrees_to_radians(float degrees)
+{
+    return degrees * MY_PI / 180.0;
+}
+
 Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos)
 {
     Eigen::Matrix4f view = Eigen::Matrix4f::Identity();
@@ -50,6 +55,37 @@ Eigen::Matrix4f get_model_matrix(float angle)
 Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio, float zNear, float zFar)
 {
     // TODO: Use the same projection matrix from the previous assignments
+    Eigen::Matrix4f projection = Eigen::Matrix4f::Identity();
+
+    zNear = -zNear;
+    zFar = -zFar;
+
+    // Perspective to Orthographic
+    Eigen::Matrix4f persp_to_ortho;
+    persp_to_ortho << zNear, 0, 0, 0,
+        0, zNear, 0, 0,
+        0, 0, zNear + zFar, -zNear * zFar,
+        0, 0, 1, 0;
+
+    // Orthographic, translate first, then scale
+    float yTop = abs(zNear) * tan(degrees_to_radians(eye_fov / 2.0));
+    float xRight = aspect_ratio * yTop;
+
+    Eigen::Matrix4f translation;
+    translation << 1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, -(zNear + zFar) / 2,
+        0, 0, 0, 1;
+
+    Eigen::Matrix4f scale;
+    scale << 1 / xRight, 0, 0, 0,
+        0, 1 / yTop, 0, 0,
+        0, 0, 2 / (zNear - zFar), 0,
+        0, 0, 0, 1;
+
+    projection = scale * translation * persp_to_ortho * projection;
+
+    return projection;
 }
 
 Eigen::Vector3f vertex_shader(const vertex_shader_payload& payload)
@@ -246,12 +282,12 @@ int main(int argc, const char** argv)
         }
     }
 
-    rst::rasterizer r(700, 700);
+    rst::rasterizer r(700, 700, 1);
 
     auto texture_path = "hmap.jpg";
     r.set_texture(Texture(obj_path + texture_path));
 
-    std::function<Eigen::Vector3f(fragment_shader_payload)> active_shader = phong_fragment_shader;
+    std::function<Eigen::Vector3f(fragment_shader_payload)> active_shader = normal_fragment_shader;
 
     if (argc >= 2) {
         command_line = true;
@@ -282,9 +318,6 @@ int main(int argc, const char** argv)
     r.set_vertex_shader(vertex_shader);
     r.set_fragment_shader(active_shader);
 
-    int key = 0;
-    int frame_count = 0;
-
     if (command_line) {
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
         r.set_model(get_model_matrix(angle));
@@ -301,6 +334,10 @@ int main(int argc, const char** argv)
         return 0;
     }
 
+    int key = 0;
+    int frame_count = 0;
+    auto start = cv::getTickCount();
+
     while (key != 27) {
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
 
@@ -314,14 +351,23 @@ int main(int argc, const char** argv)
         image.convertTo(image, CV_8UC3, 1.0f);
         cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
 
+        ++frame_count;
+        if (frame_count == 100) {
+            double time = (cv::getTickCount() - start) / cv::getTickFrequency();
+            double fps = frame_count / time;
+            std::cout << "fps: " << fps << '\n';
+            frame_count = 0;
+            start = cv::getTickCount();
+        }
+
         cv::imshow("image", image);
-        cv::imwrite(filename, image);
-        key = cv::waitKey(10);
+        // cv::imwrite(filename, image);
+        key = cv::waitKey(1);
 
         if (key == 'a') {
-            angle -= 0.1;
+            angle -= 10;
         } else if (key == 'd') {
-            angle += 0.1;
+            angle += 10;
         }
     }
     return 0;

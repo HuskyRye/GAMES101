@@ -53,7 +53,7 @@ struct col_buf_id {
 
 class rasterizer {
 public:
-    rasterizer(int w, int h);
+    rasterizer(int w, int h, int msaa = 1);
     pos_buf_id load_positions(const std::vector<Eigen::Vector3f>& positions);
     ind_buf_id load_indices(const std::vector<Eigen::Vector3i>& indices);
     col_buf_id load_colors(const std::vector<Eigen::Vector3f>& colors);
@@ -75,7 +75,7 @@ public:
     void draw(pos_buf_id pos_buffer, ind_buf_id ind_buffer, col_buf_id col_buffer, Primitive type);
     void draw(std::vector<Triangle*>& TriangleList);
 
-    std::vector<Eigen::Vector3f>& frame_buffer() { return frame_buf; }
+    std::vector<Eigen::Vector3f>& frame_buffer();
 
 private:
     void draw_line(Eigen::Vector3f begin, Eigen::Vector3f end);
@@ -102,6 +102,8 @@ private:
     std::function<Eigen::Vector3f(vertex_shader_payload)> vertex_shader;
 
     std::vector<Eigen::Vector3f> frame_buf;
+    int msaa;
+    std::vector<Eigen::Vector3f> msaa_buf;
     std::vector<float> depth_buf;
     int get_index(int x, int y);
 
