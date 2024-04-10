@@ -117,7 +117,7 @@ Eigen::Vector3f texture_fragment_shader(const fragment_shader_payload& payload)
     Eigen::Vector3f return_color = { 0, 0, 0 };
     if (payload.texture) {
         // TODO: Get the texture value at the texture coordinates of the current fragment
-        return_color = payload.texture->getColor(payload.tex_coords.x(), payload.tex_coords.y());
+        return_color = payload.texture->getColor(payload.tex_coords[0], payload.tex_coords[1]);
     }
     Eigen::Vector3f texture_color;
     texture_color << return_color.x(), return_color.y(), return_color.z();
@@ -270,13 +270,33 @@ Eigen::Vector3f bump_fragment_shader(const fragment_shader_payload& payload)
 
     // TODO: Implement bump mapping here
     // Let n = normal = (x, y, z)
+    float x = normal.x();
+    float y = normal.y();
+    float z = normal.z();
     // Vector t = (x*y/sqrt(x*x+z*z),sqrt(x*x+z*z),z*y/sqrt(x*x+z*z))
+    Eigen::Vector3f t { x * y / sqrt(x * x + z * z),
+        sqrt(x * x + z * z),
+        z * y / sqrt(x * x + z * z) };
     // Vector b = n cross product t
+    Eigen::Vector3f b = normal.cross(t);
     // Matrix TBN = [t b n]
+    Eigen::Matrix3f TBN;
+    TBN << t, b, normal;
+    float u = payload.tex_coords[0];
+    float v = payload.tex_coords[1];
+    int w = payload.texture->width;
+    int h = payload.texture->height;
+    float hCurr = payload.texture->getColor(u, v).norm();
+    float hRight = payload.texture->getColor(u + 1.0f / w, v).norm();
+    float hUp = payload.texture->getColor(u, v + 1.0f / h).norm();
     // dU = kh * kn * (h(u+1/w,v)-h(u,v))
+    float dU = kh * kn * (hRight - hCurr);
     // dV = kh * kn * (h(u,v+1/h)-h(u,v))
+    float dV = kh * kn * (hUp - hCurr);
     // Vector ln = (-dU, -dV, 1)
+    Eigen::Vector3f ln { -dU, -dV, 1.0f };
     // Normal n = normalize(TBN * ln)
+    normal = (TBN * ln).normalized();
 
     Eigen::Vector3f result_color = { 0, 0, 0 };
     result_color = normal;
@@ -311,10 +331,11 @@ int main(int argc, const char** argv)
 
     rst::rasterizer r(700, 700, 1);
 
-    auto texture_path = "spot_texture.png";
+    // auto texture_path = "spot_texture.png";
+    auto texture_path = "hmap.jpg";
     r.set_texture(Texture(obj_path + texture_path));
 
-    std::function<Eigen::Vector3f(fragment_shader_payload)> active_shader = texture_fragment_shader;
+    std::function<Eigen::Vector3f(fragment_shader_payload)> active_shader = bump_fragment_shader;
 
     if (argc >= 2) {
         command_line = true;
