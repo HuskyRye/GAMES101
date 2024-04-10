@@ -117,6 +117,7 @@ Eigen::Vector3f texture_fragment_shader(const fragment_shader_payload& payload)
     Eigen::Vector3f return_color = { 0, 0, 0 };
     if (payload.texture) {
         // TODO: Get the texture value at the texture coordinates of the current fragment
+        return_color = payload.texture->getColor(payload.tex_coords.x(), payload.tex_coords.y());
     }
     Eigen::Vector3f texture_color;
     texture_color << return_color.x(), return_color.y(), return_color.z();
@@ -143,6 +144,19 @@ Eigen::Vector3f texture_fragment_shader(const fragment_shader_payload& payload)
     for (auto& light : lights) {
         // TODO: For each light source in the code, calculate what the *ambient*, *diffuse*, and *specular*
         // components are. Then, accumulate that result on the *result_color* object.
+        Eigen::Vector3f La = ka.array() * amb_light_intensity.array();
+
+        float distance = (light.position - point).norm();
+        Eigen::Vector3f I = light.intensity / distance / distance;
+
+        Eigen::Vector3f l = (light.position - point).normalized();
+        Eigen::Vector3f Ld = kd.array() * I.array() * std::max(0.0f, normal.dot(l));
+
+        Eigen::Vector3f v = (eye_pos - point).normalized();
+        Eigen::Vector3f h = (v + l).normalized();
+        Eigen::Vector3f Ls = ks.array() * I.array() * std::pow(std::max(0.0f, normal.dot(h)), p);
+
+        result_color += La + Ld + Ls;
     }
 
     return result_color * 255.f;
@@ -173,15 +187,15 @@ Eigen::Vector3f phong_fragment_shader(const fragment_shader_payload& payload)
         // components are. Then, accumulate that result on the *result_color* object.
         Eigen::Vector3f La = ka.array() * amb_light_intensity.array();
 
-        float distance = (light.position - payload.view_pos).norm();
+        float distance = (light.position - point).norm();
         Eigen::Vector3f I = light.intensity / distance / distance;
 
-        Eigen::Vector3f l = (light.position - payload.view_pos).normalized();
-        Eigen::Vector3f Ld = kd.array() * I.array() * std::max(0.0f, payload.normal.dot(l));
+        Eigen::Vector3f l = (light.position - point).normalized();
+        Eigen::Vector3f Ld = kd.array() * I.array() * std::max(0.0f, normal.dot(l));
 
-        Eigen::Vector3f v = (eye_pos - payload.view_pos).normalized();
+        Eigen::Vector3f v = (eye_pos - point).normalized();
         Eigen::Vector3f h = (v + l).normalized();
-        Eigen::Vector3f Ls = ks.array() * I.array() * std::pow(std::max(0.0f, payload.normal.dot(h)), p);
+        Eigen::Vector3f Ls = ks.array() * I.array() * std::pow(std::max(0.0f, normal.dot(h)), p);
 
         result_color += La + Ld + Ls;
     }
@@ -297,10 +311,10 @@ int main(int argc, const char** argv)
 
     rst::rasterizer r(700, 700, 1);
 
-    auto texture_path = "hmap.jpg";
+    auto texture_path = "spot_texture.png";
     r.set_texture(Texture(obj_path + texture_path));
 
-    std::function<Eigen::Vector3f(fragment_shader_payload)> active_shader = phong_fragment_shader;
+    std::function<Eigen::Vector3f(fragment_shader_payload)> active_shader = texture_fragment_shader;
 
     if (argc >= 2) {
         command_line = true;
