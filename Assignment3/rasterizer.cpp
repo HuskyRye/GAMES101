@@ -254,6 +254,11 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t, const std::array<Eig
     int y_min = floor(std::min({ v[0].y(), v[1].y(), v[2].y() }));
     int y_max = ceil(std::max({ v[0].y(), v[1].y(), v[2].y() }));
 
+    x_min = std::max(x_min, 0);
+    y_min = std::max(y_min, 0);
+    x_max = std::min(x_max, width);
+    y_max = std::min(y_max, height);
+
     // iterate through the pixel and find if the current pixel is inside the triangle
     for (int pixel_y = y_min; pixel_y < y_max; ++pixel_y) {
         for (int pixel_x = x_min; pixel_x < x_max; ++pixel_x) {

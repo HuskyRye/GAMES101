@@ -348,9 +348,13 @@ int main(int argc, const char** argv)
     std::string filename = "output.png";
     objl::Loader Loader;
     std::string obj_path = "../models/spot/";
+    // std::string obj_path = "../models/cube/";
+    // std::string obj_path = "../models/rock/";
 
     // Load .obj File
     bool loadout = Loader.LoadFile("../models/spot/spot_triangulated_good.obj");
+    // bool loadout = Loader.LoadFile("../models/cube/cube.obj");
+    // bool loadout = Loader.LoadFile("../models/rock/rock.obj");
     for (auto mesh : Loader.LoadedMeshes) {
         for (int i = 0; i < mesh.Vertices.size(); i += 3) {
             Triangle* t = new Triangle();
@@ -365,11 +369,13 @@ int main(int argc, const char** argv)
 
     rst::rasterizer r(700, 700, 1);
 
-    // auto texture_path = "spot_texture.png";
-    auto texture_path = "hmap.jpg";
+    auto texture_path = "spot_texture.png";
+    // auto texture_path = "hmap.jpg";
+    // auto texture_path = "wall1.tif";
+    // auto texture_path = "rock.png";
     r.set_texture(Texture(obj_path + texture_path));
 
-    std::function<Eigen::Vector3f(fragment_shader_payload)> active_shader = displacement_fragment_shader;
+    std::function<Eigen::Vector3f(fragment_shader_payload)> active_shader = texture_fragment_shader;
 
     if (argc >= 2) {
         command_line = true;
@@ -378,8 +384,6 @@ int main(int argc, const char** argv)
         if (argc == 3 && std::string(argv[2]) == "texture") {
             std::cout << "Rasterizing using the texture shader\n";
             active_shader = texture_fragment_shader;
-            texture_path = "spot_texture.png";
-            r.set_texture(Texture(obj_path + texture_path));
         } else if (argc == 3 && std::string(argv[2]) == "normal") {
             std::cout << "Rasterizing using the normal shader\n";
             active_shader = normal_fragment_shader;
