@@ -4,11 +4,19 @@ GAMES101: 现代计算机图形学入门
 
 Solutions for Assignments
 
-## [Assignment 1: Rotation and Projection](/Assignment1)
+- [Assignment 1: Rotation and Projection](/Assignment1)
+- [Assignment 2: Triangles and Z-buffering](/Assignment2)
+- [Assignment 3: Pipeline and Shading](/Assignment3)
+
+- [Assignment 1: Rotation and Projection](#assignment-1-rotation-and-projection)
+- [Assignment 2: Triangles and Z-buffering](#assignment-2-triangles-and-z-buffering)
+- [Assignment 3: Pipeline and Shading](#assignment-3-pipeline-and-shading)
+
+## Assignment 1: Rotation and Projection
 
 ![Assignment 1: Rotation and Projection](/Assignment1/output.png)
 
-## [Assignment 2: Triangles and Z-buffering](/Assignment2)
+## Assignment 2: Triangles and Z-buffering
 
 ![Assignment 2: Triangles and Z-buffering](/Assignment2/output.png)
 
@@ -16,7 +24,7 @@ Solutions for Assignments
 
 ![Assignment 2: Super-sampling Anti-aliasing](/Assignment2/output_ssaa4x.png)
 
-## [Assignment 3: Pipeline and Shading](/Assignment3)
+## Assignment 3: Pipeline and Shading
 
 ### Normal shader
 
