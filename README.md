@@ -8,10 +8,6 @@ Solutions for Assignments
 - [Assignment 2: Triangles and Z-buffering](/Assignment2)
 - [Assignment 3: Pipeline and Shading](/Assignment3)
 
-- [Assignment 1: Rotation and Projection](#assignment-1-rotation-and-projection)
-- [Assignment 2: Triangles and Z-buffering](#assignment-2-triangles-and-z-buffering)
-- [Assignment 3: Pipeline and Shading](#assignment-3-pipeline-and-shading)
-
 ## Assignment 1: Rotation and Projection
 
 ![Assignment 1: Rotation and Projection](/Assignment1/output.png)
@@ -50,10 +46,10 @@ Solutions for Assignments
 
 ![Assignment 3: Other models](/Assignment3/images/cube.png)
 
-### Without Bilinear interpolation (with low resolution texture)
+### Without Bilinear interpolation (with low-resolution texture)
 
 ![Assignment 3: Without Bilinear interpolation](/Assignment3/images/texture_low.png)
 
-### Bilinear interpolation (with low resolution texture)
+### Bilinear interpolation (with low-resolution texture)
 
 ![Assignment 3: Bilinear interpolation](/Assignment3/images/texture_low_bilinear.png)
