@@ -12,6 +12,7 @@ Solutions for Assignments
 
 ![Assignment 1: Rotation and Projection](/Assignment1/output.png)
 
+
 ## Assignment 2: Triangles and Z-buffering
 
 ![Assignment 2: Triangles and Z-buffering](/Assignment2/output.png)
@@ -19,6 +20,7 @@ Solutions for Assignments
 ### Super-sampling Anti-aliasing
 
 ![Assignment 2: Super-sampling Anti-aliasing](/Assignment2/output_ssaa4x.png)
+
 
 ## Assignment 3: Pipeline and Shading
 
@@ -53,3 +55,14 @@ Solutions for Assignments
 ### Bilinear interpolation (with low-resolution texture)
 
 ![Assignment 3: Bilinear interpolation](/Assignment3/images/texture_low_bilinear.png)
+
+
+## Assignment 4: Bezier
+
+### Without anti-aliasing
+
+![Assignment 4: Bezier without anti-aliasing](/Assignment4/images/my_bezier_curve.png)
+
+### With anti-aliasing
+
+![Assignment 4: Bezier with anti-aliasing](/Assignment4/images/my_bezier_curve_aa.png)
