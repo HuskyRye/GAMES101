@@ -7,6 +7,7 @@ Solutions for Assignments
 - [Assignment 1: Rotation and Projection](/Assignment1)
 - [Assignment 2: Triangles and Z-buffering](/Assignment2)
 - [Assignment 3: Pipeline and Shading](/Assignment3)
+- [Assignment 4: Bezier](/Assignment4)
 
 ## Assignment 1: Rotation and Projection
 
