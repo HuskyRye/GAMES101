@@ -8,19 +8,20 @@ Solutions for Assignments
 - [Assignment 2: Triangles and Z-buffering](/Assignment2)
 - [Assignment 3: Pipeline and Shading](/Assignment3)
 - [Assignment 4: Bezier](/Assignment4)
+- [Assignment 5: Ray Triangle Intersect](/Assignment5)
 
 ## Assignment 1: Rotation and Projection
 
-![Assignment 1: Rotation and Projection](/Assignment1/output.png)
+![Assignment 1: Rotation and Projection](/Assignment1/images/output.png)
 
 
 ## Assignment 2: Triangles and Z-buffering
 
-![Assignment 2: Triangles and Z-buffering](/Assignment2/output.png)
+![Assignment 2: Triangles and Z-buffering](/Assignment2/images/output.png)
 
 ### Super-sampling Anti-aliasing
 
-![Assignment 2: Super-sampling Anti-aliasing](/Assignment2/output_ssaa4x.png)
+![Assignment 2: Super-sampling Anti-aliasing](/Assignment2/images/output_ssaa4x.png)
 
 
 ## Assignment 3: Pipeline and Shading
@@ -67,3 +68,8 @@ Solutions for Assignments
 ### With anti-aliasing
 
 ![Assignment 4: Bezier with anti-aliasing](/Assignment4/images/my_bezier_curve_aa.png)
+
+
+## Assignment 5: Ray Triangle Intersect
+
+![Assignment 5: Ray Triangle Intersect](/Assignment5/images/binary.ppm)

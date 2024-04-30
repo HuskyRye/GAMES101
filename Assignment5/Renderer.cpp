@@ -216,14 +216,16 @@ void Renderer::Render(const Scene& scene)
     for (int j = 0; j < scene.height; ++j) {
         for (int i = 0; i < scene.width; ++i) {
             // generate primary ray direction
-            float x;
-            float y;
+            float x = (i + 0.5f) * 2.0f / scene.width - 1.0f; // "f", otherwise it will cause bad pixels
+            float y = (j + 0.5f) * 2.0f / scene.height - 1.0f;
             // TODO: Find the x and y positions of the current pixel to get the direction
             // vector that passes through it.
             // Also, don't forget to multiply both of them with the variable *scale*, and
             // x (horizontal) variable with the *imageAspectRatio*
+            x = x * scale * imageAspectRatio;
+            y = -y * scale;
 
-            Vector3f dir = Vector3f(x, y, -1); // Don't forget to normalize this direction!
+            Vector3f dir = normalize(Vector3f(x, y, -1.0f)); // Don't forget to normalize this direction!
             framebuffer[m++] = castRay(eye_pos, dir, scene, 0);
         }
         UpdateProgress(j / (float)scene.height);
