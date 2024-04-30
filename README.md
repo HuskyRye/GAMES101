@@ -72,4 +72,4 @@ Solutions for Assignments
 
 ## Assignment 5: Ray Triangle Intersect
 
-![Assignment 5: Ray Triangle Intersect](/Assignment5/images/binary.ppm)
+![Assignment 5: Ray Triangle Intersect](/Assignment5/images/binary.png)
