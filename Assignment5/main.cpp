@@ -33,7 +33,7 @@ int main()
     scene.Add(std::make_unique<Light>(Vector3f(30, 50, -12), 0.5));
 
     Renderer r;
-    r.Render(scene);
+    r.Render(scene, 4);
 
     return 0;
 }

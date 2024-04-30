@@ -10,7 +10,7 @@ struct hit_payload {
 
 class Renderer {
 public:
-    void Render(const Scene& scene);
+    void Render(const Scene& scene, int ssaa = 1);
 
 private:
 };

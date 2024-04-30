@@ -203,7 +203,7 @@ Vector3f castRay(
 // primary rays and cast these rays into the scene. The content of the framebuffer is
 // saved to a file.
 // [/comment]
-void Renderer::Render(const Scene& scene)
+void Renderer::Render(const Scene& scene, int ssaa)
 {
     std::vector<Vector3f> framebuffer(scene.width * scene.height);
 
@@ -215,18 +215,26 @@ void Renderer::Render(const Scene& scene)
     int m = 0;
     for (int j = 0; j < scene.height; ++j) {
         for (int i = 0; i < scene.width; ++i) {
-            // generate primary ray direction
-            float x = (i + 0.5f) * 2.0f / scene.width - 1.0f; // "f", otherwise it will cause bad pixels
-            float y = (j + 0.5f) * 2.0f / scene.height - 1.0f;
-            // TODO: Find the x and y positions of the current pixel to get the direction
-            // vector that passes through it.
-            // Also, don't forget to multiply both of them with the variable *scale*, and
-            // x (horizontal) variable with the *imageAspectRatio*
-            x = x * scale * imageAspectRatio;
-            y = -y * scale;
+            // float x = (i + 0.5f) * 2.0f / scene.width - 1.0f; // "f", otherwise it will cause bad pixels
+            // float y = (j + 0.5f) * 2.0f / scene.height - 1.0f;
+            for (int b = 0; b < ssaa; ++b) {
+                for (int a = 0; a < ssaa; ++a) {
+                    // generate primary ray direction
+                    float x = (i + 1.0f / (2.0f * ssaa) + a * 1.0f / ssaa) * 2.0f / scene.width - 1.0f;
+                    float y = (j + 1.0f / (2.0f * ssaa) + b * 1.0f / ssaa) * 2.0f / scene.height - 1.0f;
+                    // TODO: Find the x and y positions of the current pixel to get the direction
+                    // vector that passes through it.
+                    // Also, don't forget to multiply both of them with the variable *scale*, and
+                    // x (horizontal) variable with the *imageAspectRatio*
+                    x = x * scale * imageAspectRatio;
+                    y = -y * scale;
 
-            Vector3f dir = normalize(Vector3f(x, y, -1.0f)); // Don't forget to normalize this direction!
-            framebuffer[m++] = castRay(eye_pos, dir, scene, 0);
+                    Vector3f dir = normalize(Vector3f(x, y, -1.0f)); // Don't forget to normalize this direction!
+                    framebuffer[m] += castRay(eye_pos, dir, scene, 0);
+                }
+            }
+            framebuffer[m] = framebuffer[m] / (ssaa * ssaa);
+            ++m;
         }
         UpdateProgress(j / (float)scene.height);
     }
