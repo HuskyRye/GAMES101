@@ -9,6 +9,7 @@ Solutions for Assignments
 - [Assignment 3: Pipeline and Shading](/Assignment3)
 - [Assignment 4: Bezier](/Assignment4)
 - [Assignment 5: Ray Triangle Intersect](/Assignment5)
+- [Assignment 6: Acceleration Structure](/Assignment6)
 
 ## Assignment 1: Rotation and Projection
 
@@ -76,4 +77,17 @@ Solutions for Assignments
 
 ### Super-sampling Anti-aliasing
 
-![Assignment 5: Ray Triangle Intersect](/Assignment5/images/binary_4x.png)
+![Assignment 5: Ray Triangle Intersect (SSAA)](/Assignment5/images/binary_4x.png)
+
+
+## Assignment 6: Acceleration Structure
+
+![Assignment 6: Bounding Volume Hierarchy](/Assignment6/images/binary.png)
+
+### Super-sampling Anti-aliasing
+
+![Assignment 6: Bounding Volume Hierarchy (SSAA)](/Assignment6/images/binary_4x.png)
+
+### Surface Area Heuristic
+
+![Assignment 6: Surface Area Heuristic](/Assignment6/images/sah.png)
