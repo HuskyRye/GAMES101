@@ -73,21 +73,15 @@ Solutions for Assignments
 
 ## Assignment 5: Ray Triangle Intersect
 
-![Assignment 5: Ray Triangle Intersect](/Assignment5/images/binary.png)
-
-### Super-sampling Anti-aliasing
-
-![Assignment 5: Ray Triangle Intersect (SSAA)](/Assignment5/images/binary_4x.png)
+![Assignment 5: Ray Triangle Intersect](/Assignment5/images/binary_4x.png)
 
 
 ## Assignment 6: Acceleration Structure
 
-![Assignment 6: Bounding Volume Hierarchy](/Assignment6/images/binary.png)
+### Bounding Volume Hierarchy (? seconds)
 
-### Super-sampling Anti-aliasing
+![Assignment 6: Bounding Volume Hierarchy](/Assignment6/images/binary_4x.png)
 
-![Assignment 6: Bounding Volume Hierarchy (SSAA)](/Assignment6/images/binary_4x.png)
-
-### Surface Area Heuristic
+### Surface Area Heuristic (? seconds)
 
 ![Assignment 6: Surface Area Heuristic](/Assignment6/images/sah.png)
