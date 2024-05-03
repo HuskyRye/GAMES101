@@ -84,9 +84,9 @@ Solutions for Assignments
 
 ### Split Methods
 
-| Method      | [^Time (seconds)] |
+| Method      | Time (seconds) |
 | :---:       | :---:          |
 | EqualCounts | 33-34          |
 | SAH         | 29-30          |
 
-[^Time (seconds)]: Running with SSAA=4
+*Measured with 4X SSAA*
