@@ -245,5 +245,5 @@ inline Intersection Triangle::getIntersection(Ray ray)
 
 inline Vector3f Triangle::evalDiffuseColor(const Vector2f&) const
 {
-    return Vector3f(0.5, 0.5, 0.5);
+    return m->getColor();
 }
