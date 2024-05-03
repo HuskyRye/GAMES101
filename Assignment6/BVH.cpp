@@ -8,6 +8,7 @@ BVHAccel::BVHAccel(std::vector<Object*> p, int maxPrimsInNode,
     , splitMethod(splitMethod)
     , primitives(std::move(p))
 {
+    printf("Using SplitMethod %s\n", splitMethod == SplitMethod::NAIVE ? "NAIVE" : "SAH");
     time_t start, stop;
     time(&start);
     if (primitives.empty())
@@ -52,30 +53,65 @@ BVHBuildNode* BVHAccel::recursiveBuild(std::vector<Object*> objects)
         for (int i = 0; i < objects.size(); ++i)
             centroidBounds = Union(centroidBounds, objects[i]->getBounds().Centroid());
         int dim = centroidBounds.maxExtent();
-        switch (dim) {
-        case 0:
-            std::sort(objects.begin(), objects.end(), [](auto f1, auto f2) {
-                return f1->getBounds().Centroid().x < f2->getBounds().Centroid().x;
+
+        auto mid = objects.begin() + (objects.size() / 2);
+        switch (splitMethod) {
+        case SplitMethod::NAIVE:
+            std::nth_element(objects.begin(), mid, objects.end(), [dim](auto f1, auto f2) {
+                return f1->getBounds().Centroid()[dim] < f2->getBounds().Centroid()[dim];
             });
             break;
-        case 1:
-            std::sort(objects.begin(), objects.end(), [](auto f1, auto f2) {
-                return f1->getBounds().Centroid().y < f2->getBounds().Centroid().y;
-            });
-            break;
-        case 2:
-            std::sort(objects.begin(), objects.end(), [](auto f1, auto f2) {
-                return f1->getBounds().Centroid().z < f2->getBounds().Centroid().z;
+        case SplitMethod::SAH:
+        default:
+            // Allocate BucketInfo for SAH partition buckets
+            constexpr int nBuckets = 12;
+            struct BucketInfo {
+                int count = 0;
+                Bounds3 bounds;
+            };
+            BucketInfo buckets[nBuckets];
+
+            // Initialize BucketInfo
+            for (Object* object : objects) {
+                int b = nBuckets * centroidBounds.Offset(object->getBounds().Centroid())[dim];
+                b = std::min(b, nBuckets - 1);
+                buckets[b].count++;
+                buckets[b].bounds = Union(buckets[b].bounds, object->getBounds());
+            }
+
+            // Find bucket to split at that minimizes SAH
+            float minCost = std::numeric_limits<float>::max();
+            int minCostSplitBucket = 0;
+            for (int i = 0; i < nBuckets - 1; ++i) {
+                // Compute cost of splitting after bucket i
+                Bounds3 boundsL, boundsR;
+                int countL = 0, countR = 0;
+                for (int j = 0; j <= i; ++j) {
+                    boundsL = Union(boundsL, buckets[j].bounds);
+                    countL += buckets[j].count;
+                }
+                for (int j = i + 1; j < nBuckets; ++j) {
+                    boundsR = Union(boundsR, buckets[j].bounds);
+                    countR += buckets[j].count;
+                }
+                float cost = countL * boundsL.SurfaceArea() + countR * boundsR.SurfaceArea();
+                if (cost < minCost) {
+                    minCost = cost;
+                    minCostSplitBucket = i;
+                }
+            }
+
+            // Split at minCostSplitBucket
+            mid = std::partition(objects.begin(), objects.end(), [=](auto object) {
+                int b = nBuckets * centroidBounds.Offset(object->getBounds().Centroid())[dim];
+                b = std::min(b, nBuckets - 1);
+                return b <= minCostSplitBucket;
             });
             break;
         }
 
-        auto beginning = objects.begin();
-        auto middling = objects.begin() + (objects.size() / 2);
-        auto ending = objects.end();
-
-        auto leftshapes = std::vector<Object*>(beginning, middling);
-        auto rightshapes = std::vector<Object*>(middling, ending);
+        auto leftshapes = std::vector<Object*>(objects.begin(), mid);
+        auto rightshapes = std::vector<Object*>(mid, objects.end());
 
         assert(objects.size() == (leftshapes.size() + rightshapes.size()));
 

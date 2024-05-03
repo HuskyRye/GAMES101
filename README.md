@@ -78,10 +78,15 @@ Solutions for Assignments
 
 ## Assignment 6: Acceleration Structure
 
-### Bounding Volume Hierarchy (? seconds)
+### Bounding Volume Hierarchy
 
 ![Assignment 6: Bounding Volume Hierarchy](/Assignment6/images/binary_4x.png)
 
-### Surface Area Heuristic (? seconds)
+### Split Methods
 
-![Assignment 6: Surface Area Heuristic](/Assignment6/images/sah.png)
+| Method      | [^Time (seconds)] |
+| :---:       | :---:          |
+| EqualCounts | 33-34          |
+| SAH         | 29-30          |
+
+[^Time (seconds)]: Running with SSAA=4
