@@ -82,7 +82,7 @@ Solutions for Assignments
 
 ![Assignment 6: Bounding Volume Hierarchy](/Assignment6/images/binary_4x.png)
 
-### Split Methods
+### Comparison of Splitting Methods 
 
 | Method      | Time (seconds) |
 | :---:       | :---:          |
