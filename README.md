@@ -99,6 +99,11 @@ Solutions for Assignments
 
 ![Assignment 7: Path Tracing](/Assignment7/images/direct_64.png)
 
-### Girect Illumination
+### Global Illumination
+
+#### 64 SPP
 
 ![Assignment 7: Path Tracing](/Assignment7/images/global_64.png)
+
+#### 1024 SPP
+![Assignment 7: Path Tracing](/Assignment7/images/global_1024.png)
