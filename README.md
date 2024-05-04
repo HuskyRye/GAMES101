@@ -10,6 +10,7 @@ Solutions for Assignments
 - [Assignment 4: Bezier](/Assignment4)
 - [Assignment 5: Ray Triangle Intersect](/Assignment5)
 - [Assignment 6: Acceleration Structure](/Assignment6)
+- [Assignment 7: Path Tracing](/Assignment7)
 
 ## Assignment 1: Rotation and Projection
 
@@ -90,3 +91,14 @@ Solutions for Assignments
 | SAH         | 29-30          |
 
 *Measured with 4X SSAA*
+
+
+## Assignment 7: Path Tracing
+
+### Direct Illumination
+
+![Assignment 7: Path Tracing](/Assignment7/images/direct_64.png)
+
+### Girect Illumination
+
+![Assignment 7: Path Tracing](/Assignment7/images/global_64.png)
