@@ -107,3 +107,6 @@ Solutions for Assignments
 
 #### 1024 SPP
 ![Assignment 7: Path Tracing](/Assignment7/images/global_1024.png)
+
+#### 10240 SPP
+![Assignment 7: Path Tracing](/Assignment7/images/global_10240.png)
