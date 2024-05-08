@@ -8,7 +8,8 @@
 #include "Vector.hpp"
 #include "global.hpp"
 
-enum MaterialType { DIFFUSE };
+enum MaterialType { DIFFUSE,
+    MICROFACET };
 
 class Material {
 private:
@@ -91,11 +92,22 @@ private:
         return a.x * B + a.y * C + a.z * N;
     }
 
+    // normal distribution function
+    // Trowbridge-Reitz 1975 (GGX 2007)
+    float D_GGX(float alpha, float NoH)
+    {
+        float alphaSq = alpha * alpha;
+        float denom = (alphaSq - 1.0f) * NoH * NoH + 1.0f;
+        denom = std::max(EPSILON, denom);
+        return alphaSq / (M_PI * denom * denom); // Numerical accuracy issues
+    }
+
 public:
     MaterialType m_type;
     // Vector3f m_color;
     Vector3f m_emission;
     float ior;
+    float roughness;
     Vector3f Kd, Ks;
     float specularExponent;
     // Texture tex;
@@ -148,7 +160,18 @@ Vector3f Material::sample(const Vector3f& wi, const Vector3f& N)
         float r = std::sqrt(1.0f - z * z), phi = 2 * M_PI * x_2;
         Vector3f localRay(r * std::cos(phi), r * std::sin(phi), z);
         return toWorld(localRay, N);
-
+        break;
+    }
+    case MICROFACET: {
+        float alpha = roughness * roughness;
+        float alphaSq = alpha * alpha;
+        float e_1 = get_random_float();
+        float e_2 = get_random_float();
+        float phi = 2 * M_PI * e_1;
+        float theta = std::acos(sqrt((1 - e_2) / (e_2 * (alphaSq - 1.0f) + 1.0f)));
+        Vector3f localRay(std::sin(theta) * std::cos(phi), std::sin(theta) * std::sin(phi), std::cos(theta));
+        Vector3f h = toWorld(localRay, N);
+        return reflect(-wi, h);
         break;
     }
     }
@@ -156,29 +179,67 @@ Vector3f Material::sample(const Vector3f& wi, const Vector3f& N)
 
 float Material::pdf(const Vector3f& wi, const Vector3f& wo, const Vector3f& N)
 {
+    if (dotProduct(wo, N) < EPSILON || dotProduct(wi, N) < EPSILON)
+        return 0.0f;
+    Vector3f h = normalize(wo + wi);
     switch (m_type) {
     case DIFFUSE: {
         // uniform sample probability 1 / (2 * PI)
-        if (dotProduct(wo, N) > 0.0f)
-            return 0.5f / M_PI;
-        else
-            return 0.0f;
+        return 0.5f / M_PI;
         break;
+    }
+    case MICROFACET: {
+        float alpha = roughness * roughness;
+        float alphaSq = alpha * alpha;
+        float NoH = dotProduct(N, h);
+
+        float D = D_GGX(alpha, NoH);
+        return D * NoH / (4.0f * dotProduct(wo, h));
     }
     }
 }
 
 Vector3f Material::eval(const Vector3f& wi, const Vector3f& wo, const Vector3f& N)
 {
+    float NoV = dotProduct(N, wo);
+    float NoL = dotProduct(N, wi);
+    if (NoV < EPSILON || NoL < EPSILON)
+        return Vector3f(0.0f);
+
     switch (m_type) {
     case DIFFUSE: {
-        // calculate the contribution of diffuse   model
-        float cosalpha = dotProduct(N, wo);
-        if (cosalpha > 0.0f) {
-            Vector3f diffuse = Kd / M_PI;
-            return diffuse;
-        } else
-            return Vector3f(0.0f);
+        // calculate the contribution of diffuse model
+        Vector3f diffuse = Kd / M_PI;
+        return diffuse;
+        break;
+    }
+    case MICROFACET: {
+        float alpha = roughness * roughness;
+        float alphaSq = alpha * alpha;
+
+        Vector3f h = normalize(wi + wo);
+
+        float LoH = clamp(0.0f, 1.0f, dotProduct(wi, h));
+        float NoH = clamp(0.0f, 1.0f, dotProduct(N, h));
+
+        // Fresnel reflectance
+        // Schlick 1994
+        Vector3f F = Ks + (Vector3f(1.0f) - Ks) * std::pow(1.0f - LoH, 5.0f);
+
+        // geometrical attenuation factor
+        // Heitz 2014
+        float lambdaV = NoL * std::sqrt(NoV * NoV * (1.0f - alphaSq) + alphaSq);
+        float lambdaL = NoV * std::sqrt(NoL * NoL * (1.0f - alphaSq) + alphaSq);
+        float V = 0.5f / (lambdaV + lambdaL);
+
+        // normal distribution function
+        // Trowbridge-Reitz 1975 (GGX 2007)
+        float D = D_GGX(alpha, NoH);
+
+        // Vector3f specular = F * G * D / (4.0f * dotProduct(wo, N) * dotProduct(wi, N));
+        Vector3f specular = D * V * F;
+
+        return specular;
         break;
     }
     }

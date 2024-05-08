@@ -72,7 +72,7 @@ public:
             return result;
         if (t0 < 0)
             t0 = t1;
-        if (t0 < 0)
+        if (t0 < 0.5f) // to avoid self intersection
             return result;
         result.happened = true;
 

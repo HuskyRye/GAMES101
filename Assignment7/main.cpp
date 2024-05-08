@@ -25,16 +25,44 @@ int main(int argc, char** argv)
     Material* light = new Material(DIFFUSE, (8.0f * Vector3f(0.747f + 0.058f, 0.747f + 0.258f, 0.747f) + 15.6f * Vector3f(0.740f + 0.287f, 0.740f + 0.160f, 0.740f) + 18.4f * Vector3f(0.737f + 0.642f, 0.737f + 0.159f, 0.737f)));
     light->Kd = Vector3f(0.65f);
 
+    Material* gold = new Material(MICROFACET, Vector3f(0.0f));
+    gold->Ks = Vector3f(1.000f, 0.782f, 0.344f);
+    gold->roughness = 0.3f;
+    Material* silver = new Material(MICROFACET, Vector3f(0.0f));
+    silver->Ks = Vector3f(0.97f, 0.96f, 0.91f);
+    silver->roughness = 0.3f;
+    Material* copper = new Material(MICROFACET, Vector3f(0.0f));
+    copper->Ks = Vector3f(0.97f, 0.74f, 0.62f);
+    copper->roughness = 0.3f;
+
+    Material* mirror = new Material(MICROFACET, Vector3f(0.0f));
+    mirror->Ks = Vector3f(1.0f, 1.0f, 1.0f);
+    mirror->roughness = 0.05f; // minimun value here!
+
+    float radius = 75;
+    Sphere sph1(Vector3f(278 + 175, radius, 200), radius, gold);
+    Sphere sph2(Vector3f(278, radius, 200), radius, silver);
+    Sphere sph3(Vector3f(278 - 175, radius, 200), radius, copper);
+    scene.Add(&sph1);
+    scene.Add(&sph2);
+    scene.Add(&sph3);
+
+    // float radius = 100;
+    // Sphere sph1(Vector3f(278 + 125, radius, 200), radius, mirror);
+    // Sphere sph2(Vector3f(278 - 125, radius, 200), radius, mirror);
+    // scene.Add(&sph1);
+    // scene.Add(&sph2);
+
     MeshTriangle floor("../models/cornellbox/floor.obj", white);
     MeshTriangle shortbox("../models/cornellbox/shortbox.obj", white);
-    MeshTriangle tallbox("../models/cornellbox/tallbox.obj", white);
+    MeshTriangle tallbox("../models/cornellbox/tallbox.obj", mirror);
     MeshTriangle left("../models/cornellbox/left.obj", red);
     MeshTriangle right("../models/cornellbox/right.obj", green);
     MeshTriangle light_("../models/cornellbox/light.obj", light);
 
     scene.Add(&floor);
-    scene.Add(&shortbox);
-    scene.Add(&tallbox);
+    // scene.Add(&shortbox);
+    // scene.Add(&tallbox);
     scene.Add(&left);
     scene.Add(&right);
     scene.Add(&light_);

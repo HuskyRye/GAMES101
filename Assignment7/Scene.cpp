@@ -87,17 +87,17 @@ Vector3f Scene::castRay(const Ray& ray, int depth) const
     if (intersect(Ray(p, ws)).distance > lightDistance - EPSILON) {
         float cos_theta = std::max(0.f, dotProduct(ws, N));
         float cos_theta_x = std::max(0.f, dotProduct(-ws, light.normal));
-        L_dir = light.emit * m->eval(ws, wo, N) * cos_theta * cos_theta_x
+        L_dir = light.emit * m->eval(wo, ws, N) * cos_theta * cos_theta_x
             / lightDistance / lightDistance / pdf_light;
     }
 
     // Indirect illumination
     if (get_random_float() < RussianRoulette) {
-        Vector3f wi = m->sample(wo, N);
+        Vector3f wi = normalize(m->sample(wo, N));
         float pdf_hemi = m->pdf(wo, wi, N);
         if (pdf_hemi > EPSILON) { // Otherwise, it will cause white spots
             float cos_theta = std::max(0.f, dotProduct(wi, N));
-            L_indir = castRay(Ray(p, wi), depth + 1) * m->eval(wi, wo, N) * cos_theta
+            L_indir = castRay(Ray(p, wi), depth + 1) * m->eval(wo, wi, N) * cos_theta
                 / pdf_hemi / RussianRoulette;
         }
     }

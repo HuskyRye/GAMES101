@@ -110,3 +110,15 @@ Solutions for Assignments
 
 #### 10240 SPP
 ![Assignment 7: Path Tracing](/Assignment7/images/global_10240.png)
+
+### Microfacet material
+
+#### Mirror
+
+![Assignment 7: Path Tracing](/Assignment7/images/microfacet_mirror_10240.png)
+
+![Assignment 7: Path Tracing](/Assignment7/images/microfacet_mirror2_10240.png)
+
+#### Metals
+
+![Assignment 7: Path Tracing](/Assignment7/images/microfacet_metals_10240.png)
