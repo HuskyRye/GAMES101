@@ -11,6 +11,7 @@ Solutions for Assignments
 - [Assignment 5: Ray Triangle Intersect](/Assignment5)
 - [Assignment 6: Acceleration Structure](/Assignment6)
 - [Assignment 7: Path Tracing](/Assignment7)
+- [Assignment 8: Mass Spring System](/Assignment8)
 
 ## Assignment 1: Rotation and Projection
 
@@ -122,3 +123,8 @@ Solutions for Assignments
 #### Metals
 
 ![Assignment 7: Path Tracing](/Assignment7/images/microfacet_metals_10240.png)
+
+
+## Assignment 8: Mass Spring System
+
+![Assignment 7: Path Tracing](/Assignment8/images/ropesim.gif)
